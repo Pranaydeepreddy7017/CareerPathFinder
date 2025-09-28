@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+neo4j
+pandas
+scikit-learn
+torch
+joblib
+pydantic-settings
+google-generativeai
