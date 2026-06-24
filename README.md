@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Student Career Pathfinder
 
-## Getting Started
+A full-stack web app that helps students plan their academic journey — recommending next-term courses, predicting their likelihood of success in each, and surfacing AI-generated career-path insights grounded in the courses they've already completed.
 
-First, run the development server:
+Built for **HackUMBC 2025** (Data Science track).
+
+---
+
+## What it does
+
+Students log in with their school ID and land on a personalized dashboard. From there they can:
+
+- **See recommended courses** for the upcoming term, each with a predicted success score based on their completed coursework and prerequisites.
+- **Explore career paths** — the app analyzes their course history and returns ranked career options (e.g. Data Scientist, Software Engineer) with a probability, a confidence level, short reasoning, and recommended next courses for that path.
+- **Track progress** on a profile dashboard showing total/completed/remaining credits, a completion-progress ring, and a semester-by-semester comparison against the program average.
+
+Advisors get a separate role with access to student analytics and progress tracking.
+
+---
+
+## How it works
+
+**Frontend** — Next.js + TypeScript. Role-based flow (student / advisor), login, dashboard, course recommendations, career-path explorer, and an analytics/profile view with progress charts.
+
+**Backend** — Python. Two prediction paths:
+
+1. **Course recommendation & success prediction.** Course and curriculum data is loaded into a **Neo4j** graph; the backend extracts features from it and uses **neural-net models** to recommend next-term courses and estimate the student's likelihood of success in each.
+2. **Career-path exploration.** For open-ended career guidance, the backend calls the **Gemini API** with the student's completed courses and returns ranked career paths with probabilities, confidence levels, reasoning, and suggested follow-on courses.
+
+This split is deliberate: trained models handle the structured recommendation/prediction task, while the LLM handles the more open-ended, reasoning-heavy career-path generation.
+
+---
+
+## Tech stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | Next.js, TypeScript, React |
+| Backend | Python |
+| Data / Graph | Neo4j |
+| ML | Neural-net models (course recommendation & success prediction) |
+| LLM | Google Gemini API (career-path predictions) |
+
+---
+
+## Getting started
+
+> The app runs locally. You'll need Node.js, Python, a Neo4j instance, and a Gemini API key.
+
+**1. Clone and install frontend dependencies**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Pranaydeepreddy7017/CareerPathFinder.git
+cd CareerPathFinder
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**2. Install backend dependencies**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pip install -r requirements.txt
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**3. Configure environment**
 
-## Learn More
+Create a `.env` (or `.env.local`) with your credentials:
 
-To learn more about Next.js, take a look at the following resources:
+```
+GEMINI_API_KEY=your_key_here
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=your_password
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**4. Load data into Neo4j**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Start your Neo4j instance and load the course dataset (see `core.py` / `service.py` for the ingestion logic).
 
-## Deploy on Vercel
+**5. Run**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# backend
+python api.py
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# frontend (in a separate terminal)
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Project layout
+
+```
+app/             Next.js frontend (pages, components)
+public/          Static assets
+api.py           Backend API entry point
+service.py       Service / orchestration layer
+core.py          Core logic and Neo4j ingestion
+career.py        Career-path generation (Gemini)
+recommend.py     Course recommendation logic
+train.py         Model training for predictions
+requirements.txt Python dependencies
+```
+
+---
+
+## Notes & limitations
+
+- Built in a hackathon timeframe; some dashboard figures (e.g. the program-average comparison) use mock data for demonstration.
+- Not deployed — runs locally.
+- The career-path predictions are LLM-generated guidance, not authoritative advising.
+
+---
+
+## Team
+
+Submitted to HackUMBC 2025, Data Science track.
